@@ -825,8 +825,12 @@ rte_eal_init(int argc, char **argv)
 
 	rte_config_init();
 
-	if (rte_eal_log_init(logid, internal_config.syslog_facility) < 0)
-		rte_panic("Cannot init logs\n");
+	if (rte_eal_log_init(logid, internal_config.syslog_facility) < 0) {
+		rte_eal_init_alert("Cannot init logging.");
+		rte_errno = ENOMEM;
+		rte_atomic32_clear(&run_once);
+		return -1;
+	}
 
 	if (rte_eal_pci_init() < 0)
 		rte_panic("Cannot init PCI\n");
