@@ -848,8 +848,11 @@ rte_eal_init(int argc, char **argv)
 	}
 #endif
 
-	if (rte_eal_memory_init() < 0)
-		rte_panic("Cannot init memory\n");
+	if (rte_eal_memory_init() < 0) {
+		rte_eal_init_alert("Cannot init memory\n");
+		rte_errno = ENOMEM;
+		return -1;
+	}
 
 	/* the directories are locked during eal_hugepage_info_init */
 	eal_hugedirs_unlock();
