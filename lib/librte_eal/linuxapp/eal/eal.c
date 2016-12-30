@@ -869,8 +869,11 @@ rte_eal_init(int argc, char **argv)
 		return -1;
 	}
 
-	if (rte_eal_alarm_init() < 0)
-		rte_panic("Cannot init interrupt-handling thread\n");
+	if (rte_eal_alarm_init() < 0) {
+		rte_eal_init_alert("Cannot init interrupt-handling thread\n");
+		/* rte_eal_alarm_init sets rte_errno on failure. */
+		return -1;
+	}
 
 	if (rte_eal_timer_init() < 0)
 		rte_panic("Cannot init HPET or TSC timers\n");
