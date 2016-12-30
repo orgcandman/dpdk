@@ -943,8 +943,11 @@ rte_eal_init(int argc, char **argv)
 		rte_panic("Cannot probe devices\n");
 
 	/* Probe & Initialize PCI devices */
-	if (rte_eal_pci_probe())
-		rte_panic("Cannot probe PCI\n");
+	if (rte_eal_pci_probe()) {
+		rte_eal_init_alert("Cannot probe PCI\n");
+		rte_errno = ENOTSUP;
+		return -1;
+	}
 
 	if (rte_eal_dev_init() < 0)
 		rte_panic("Cannot init pmd devices\n");
