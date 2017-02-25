@@ -899,8 +899,11 @@ rte_eal_init(int argc, char **argv)
 		return -1;
 	}
 
-	if (rte_bus_scan())
-		rte_panic("Cannot scan the buses for devices\n");
+	if (rte_bus_scan()) {
+		rte_eal_init_alert("Cannot scan the buses for devices\n");
+		rte_errno = ENODEV;
+		return -1;
+	}
 
 	RTE_LCORE_FOREACH_SLAVE(i) {
 
