@@ -40,13 +40,13 @@ extern "C" {
 #endif
 
 #define	EFX_STATIC_ASSERT(_cond)		\
-	((void)sizeof(char[(_cond) ? 1 : -1]))
+	((void)sizeof (char[(_cond) ? 1 : -1]))
 
 #define	EFX_ARRAY_SIZE(_array)			\
-	(sizeof(_array) / sizeof((_array)[0]))
+	(sizeof (_array) / sizeof ((_array)[0]))
 
 #define	EFX_FIELD_OFFSET(_type, _field)		\
-	((size_t) &(((_type *)0)->_field))
+	((size_t)&(((_type *)0)->_field))
 
 /* Return codes */
 
@@ -555,7 +555,7 @@ efx_mac_stats_get_mask(
 
 #define	EFX_MAC_STAT_SUPPORTED(_mask, _stat)	\
 	((_mask)[(_stat) / EFX_MAC_STATS_MASK_BITS_PER_PAGE] &	\
-	 (1ULL << ((_stat) & (EFX_MAC_STATS_MASK_BITS_PER_PAGE - 1))))
+	    (1ULL << ((_stat) & (EFX_MAC_STATS_MASK_BITS_PER_PAGE - 1))))
 
 #define	EFX_MAC_STATS_SIZE 0x400
 
@@ -903,7 +903,8 @@ typedef enum efx_phy_media_type_e {
 	EFX_PHY_MEDIA_NTYPES
 } efx_phy_media_type_t;
 
-/* Get the type of medium currently used.  If the board has ports for
+/*
+ * Get the type of medium currently used.  If the board has ports for
  * modules, a module is present, and we recognise the media type of
  * the module, then this will be the media type of the module.
  * Otherwise it will be the media type of the port.
@@ -1004,7 +1005,7 @@ typedef enum efx_bist_type_e {
 	EFX_BIST_TYPE_PHY_CABLE_SHORT,
 	EFX_BIST_TYPE_PHY_CABLE_LONG,
 	EFX_BIST_TYPE_MC_MEM,	/* Test the MC DMEM and IMEM */
-	EFX_BIST_TYPE_SAT_MEM,	/* Test the DMEM and IMEM of satellite cpus*/
+	EFX_BIST_TYPE_SAT_MEM,	/* Test the DMEM and IMEM of satellite cpus */
 	EFX_BIST_TYPE_REG,	/* Test the register memories */
 	EFX_BIST_TYPE_NTYPES,
 } efx_bist_type_t;
@@ -1035,8 +1036,10 @@ typedef enum efx_bist_value_e {
 	EFX_BIST_PHY_CABLE_STATUS_C,
 	EFX_BIST_PHY_CABLE_STATUS_D,
 	EFX_BIST_FAULT_CODE,
-	/* Memory BIST specific values. These match to the MC_CMD_BIST_POLL
-	 * response. */
+	/*
+	 * Memory BIST specific values. These match to the MC_CMD_BIST_POLL
+	 * response.
+	 */
 	EFX_BIST_MEM_TEST,
 	EFX_BIST_MEM_ADDR,
 	EFX_BIST_MEM_BUS,
@@ -1778,8 +1781,7 @@ typedef __checkReturn	boolean_t
 typedef __checkReturn	boolean_t
 (*efx_mac_stats_ev_t)(
 	__in_opt	void *arg,
-	__in		uint32_t generation
-	);
+	__in		uint32_t generation);
 
 #endif	/* EFSYS_OPT_MAC_STATS */
 
@@ -2500,8 +2502,7 @@ efx_lic_find_start(
 	__in_bcount(buffer_size)
 				caddr_t bufferp,
 	__in			size_t buffer_size,
-	__out			uint32_t *startp
-	);
+	__out			uint32_t *startp);
 
 extern	__checkReturn		efx_rc_t
 efx_lic_find_end(
@@ -2510,8 +2511,7 @@ efx_lic_find_end(
 				caddr_t bufferp,
 	__in			size_t buffer_size,
 	__in			uint32_t offset,
-	__out			uint32_t *endp
-	);
+	__out			uint32_t *endp);
 
 extern	__checkReturn	__success(return != B_FALSE)	boolean_t
 efx_lic_find_key(
@@ -2521,15 +2521,13 @@ efx_lic_find_key(
 	__in			size_t buffer_size,
 	__in			uint32_t offset,
 	__out			uint32_t *startp,
-	__out			uint32_t *lengthp
-	);
+	__out			uint32_t *lengthp);
 
 extern	__checkReturn	__success(return != B_FALSE)	boolean_t
 efx_lic_validate_key(
 	__in			efx_nic_t *enp,
 	__in_bcount(length)	caddr_t keyp,
-	__in			uint32_t length
-	);
+	__in			uint32_t length);
 
 extern	__checkReturn		efx_rc_t
 efx_lic_read_key(
@@ -2542,8 +2540,7 @@ efx_lic_read_key(
 	__out_bcount_part(key_max_size, *lengthp)
 				caddr_t keyp,
 	__in			size_t key_max_size,
-	__out			uint32_t *lengthp
-	);
+	__out			uint32_t *lengthp);
 
 extern	__checkReturn		efx_rc_t
 efx_lic_write_key(
@@ -2554,8 +2551,7 @@ efx_lic_write_key(
 	__in			uint32_t offset,
 	__in_bcount(length)	caddr_t keyp,
 	__in			uint32_t length,
-	__out			uint32_t *lengthp
-	);
+	__out			uint32_t *lengthp);
 
 	__checkReturn		efx_rc_t
 efx_lic_delete_key(
@@ -2566,24 +2562,21 @@ efx_lic_delete_key(
 	__in			uint32_t offset,
 	__in			uint32_t length,
 	__in			uint32_t end,
-	__out			uint32_t *deltap
-	);
+	__out			uint32_t *deltap);
 
 extern	__checkReturn		efx_rc_t
 efx_lic_create_partition(
 	__in			efx_nic_t *enp,
 	__in_bcount(buffer_size)
 				caddr_t bufferp,
-	__in			size_t buffer_size
-	);
+	__in			size_t buffer_size);
 
 extern	__checkReturn		efx_rc_t
 efx_lic_finish_partition(
 	__in			efx_nic_t *enp,
 	__in_bcount(buffer_size)
 				caddr_t bufferp,
-	__in			size_t buffer_size
-	);
+	__in			size_t buffer_size);
 
 #endif	/* EFSYS_OPT_LICENSING */
 
