@@ -121,6 +121,8 @@ fs_dev_configure(struct rte_eth_dev *dev)
 					dev->data->nb_tx_queues,
 					&dev->data->dev_conf);
 		if (ret) {
+			if (!fs_err(sdev, ret))
+				continue;
 			ERROR("Could not configure sub_device %d", i);
 			return ret;
 		}
@@ -163,8 +165,11 @@ fs_dev_start(struct rte_eth_dev *dev)
 			continue;
 		DEBUG("Starting sub_device %d", i);
 		ret = rte_eth_dev_start(PORT_ID(sdev));
-		if (ret)
+		if (ret) {
+			if (!fs_err(sdev, ret))
+				continue;
 			return ret;
+		}
 		sdev->state = DEV_STARTED;
 	}
 	if (PRIV(dev)->state < DEV_STARTED)
@@ -196,7 +201,7 @@ fs_dev_set_link_up(struct rte_eth_dev *dev)
 	FOREACH_SUBDEV_STATE(sdev, i, dev, DEV_ACTIVE) {
 		DEBUG("Calling rte_eth_dev_set_link_up on sub_device %d", i);
 		ret = rte_eth_dev_set_link_up(PORT_ID(sdev));
-		if (ret) {
+		if ((ret = fs_err(sdev, ret))) {
 			ERROR("Operation rte_eth_dev_set_link_up failed for sub_device %d"
 			      " with error %d", i, ret);
 			return ret;
@@ -215,7 +220,7 @@ fs_dev_set_link_down(struct rte_eth_dev *dev)
 	FOREACH_SUBDEV_STATE(sdev, i, dev, DEV_ACTIVE) {
 		DEBUG("Calling rte_eth_dev_set_link_down on sub_device %d", i);
 		ret = rte_eth_dev_set_link_down(PORT_ID(sdev));
-		if (ret) {
+		if ((ret = fs_err(sdev, ret))) {
 			ERROR("Operation rte_eth_dev_set_link_down failed for sub_device %d"
 			      " with error %d", i, ret);
 			return ret;
@@ -300,7 +305,7 @@ fs_rx_queue_setup(struct rte_eth_dev *dev,
 				rx_queue_id,
 				nb_rx_desc, socket_id,
 				rx_conf, mb_pool);
-		if (ret) {
+		if ((ret = fs_err(sdev, ret))) {
 			ERROR("RX queue setup failed for sub_device %d", i);
 			goto free_rxq;
 		}
@@ -366,7 +371,7 @@ fs_tx_queue_setup(struct rte_eth_dev *dev,
 				tx_queue_id,
 				nb_tx_desc, socket_id,
 				tx_conf);
-		if (ret) {
+		if ((ret = fs_err(sdev, ret))) {
 			ERROR("TX queue setup failed for sub_device %d", i);
 			goto free_txq;
 		}
@@ -445,7 +450,8 @@ fs_link_update(struct rte_eth_dev *dev,
 	FOREACH_SUBDEV_STATE(sdev, i, dev, DEV_ACTIVE) {
 		DEBUG("Calling link_update on sub_device %d", i);
 		ret = (SUBOPS(sdev, link_update))(ETH(sdev), wait_to_complete);
-		if (ret && ret != -1) {
+		if (ret && ret != -1 && sdev->remove == 0 &&
+		    rte_eth_dev_is_removed(PORT_ID(sdev)) == 0) {
 			ERROR("Link update failed for sub_device %d with error %d",
 			      i, ret);
 			return ret;
@@ -469,6 +475,7 @@ static int
 fs_stats_get(struct rte_eth_dev *dev,
 	     struct rte_eth_stats *stats)
 {
+	struct rte_eth_stats backup;
 	struct sub_device *sdev;
 	uint8_t i;
 	int ret;
@@ -478,14 +485,20 @@ fs_stats_get(struct rte_eth_dev *dev,
 		struct rte_eth_stats *snapshot = &sdev->stats_snapshot.stats;
 		uint64_t *timestamp = &sdev->stats_snapshot.timestamp;
 
+		rte_memcpy(&backup, snapshot, sizeof(backup));
 		ret = rte_eth_stats_get(PORT_ID(sdev), snapshot);
 		if (ret) {
+			if (!fs_err(sdev, ret)) {
+				rte_memcpy(snapshot, &backup, sizeof(backup));
+				goto inc;
+			}
 			ERROR("Operation rte_eth_stats_get failed for sub_device %d with error %d",
 				  i, ret);
 			*timestamp = 0;
 			return ret;
 		}
 		*timestamp = rte_rdtsc();
+inc:
 		failsafe_stats_increment(stats, snapshot);
 	}
 	return 0;
@@ -598,7 +611,7 @@ fs_mtu_set(struct rte_eth_dev *dev, uint16_t mtu)
 	FOREACH_SUBDEV_STATE(sdev, i, dev, DEV_ACTIVE) {
 		DEBUG("Calling rte_eth_dev_set_mtu on sub_device %d", i);
 		ret = rte_eth_dev_set_mtu(PORT_ID(sdev), mtu);
-		if (ret) {
+		if ((ret = fs_err(sdev, ret))) {
 			ERROR("Operation rte_eth_dev_set_mtu failed for sub_device %d with error %d",
 			      i, ret);
 			return ret;
@@ -617,7 +630,7 @@ fs_vlan_filter_set(struct rte_eth_dev *dev, uint16_t vlan_id, int on)
 	FOREACH_SUBDEV_STATE(sdev, i, dev, DEV_ACTIVE) {
 		DEBUG("Calling rte_eth_dev_vlan_filter on sub_device %d", i);
 		ret = rte_eth_dev_vlan_filter(PORT_ID(sdev), vlan_id, on);
-		if (ret) {
+		if ((ret = fs_err(sdev, ret))) {
 			ERROR("Operation rte_eth_dev_vlan_filter failed for sub_device %d"
 			      " with error %d", i, ret);
 			return ret;
@@ -651,7 +664,7 @@ fs_flow_ctrl_set(struct rte_eth_dev *dev,
 	FOREACH_SUBDEV_STATE(sdev, i, dev, DEV_ACTIVE) {
 		DEBUG("Calling rte_eth_dev_flow_ctrl_set on sub_device %d", i);
 		ret = rte_eth_dev_flow_ctrl_set(PORT_ID(sdev), fc_conf);
-		if (ret) {
+		if ((ret = fs_err(sdev, ret))) {
 			ERROR("Operation rte_eth_dev_flow_ctrl_set failed for sub_device %d"
 			      " with error %d", i, ret);
 			return ret;
@@ -688,7 +701,7 @@ fs_mac_addr_add(struct rte_eth_dev *dev,
 	RTE_ASSERT(index < FAILSAFE_MAX_ETHADDR);
 	FOREACH_SUBDEV_STATE(sdev, i, dev, DEV_ACTIVE) {
 		ret = rte_eth_dev_mac_addr_add(PORT_ID(sdev), mac_addr, vmdq);
-		if (ret) {
+		if ((ret = fs_err(sdev, ret))) {
 			ERROR("Operation rte_eth_dev_mac_addr_add failed for sub_device %"
 			      PRIu8 " with error %d", i, ret);
 			return ret;
@@ -730,7 +743,7 @@ fs_filter_ctrl(struct rte_eth_dev *dev,
 	FOREACH_SUBDEV_STATE(sdev, i, dev, DEV_ACTIVE) {
 		DEBUG("Calling rte_eth_dev_filter_ctrl on sub_device %d", i);
 		ret = rte_eth_dev_filter_ctrl(PORT_ID(sdev), type, op, arg);
-		if (ret) {
+		if ((ret = fs_err(sdev, ret))) {
 			ERROR("Operation rte_eth_dev_filter_ctrl failed for sub_device %d"
 			      " with error %d", i, ret);
 			return ret;
