@@ -83,6 +83,7 @@ enum {
 #endif
 
 #define ISOLATE_HANDLE 1
+#define REMOTE_PROMISCUOUS_HANDLE 2
 
 struct rte_flow {
 	LIST_ENTRY(rte_flow) next; /* Pointer to the next rte_flow structure */
@@ -1556,9 +1557,15 @@ int tap_flow_implicit_create(struct pmd_internals *pmd,
 	 * The ISOLATE rule is always present and must have a static handle, as
 	 * the action is changed whether the feature is enabled (DROP) or
 	 * disabled (PASSTHRU).
+	 * There is just one REMOTE_PROMISCUOUS rule in all cases. It should
+	 * have a static handle such that adding it twice will fail with EEXIST
+	 * with any kernel version. Remark: old kernels may falsely accept the
+	 * same REMOTE_PROMISCUOUS rules if they had different handles.
 	 */
 	if (idx == TAP_ISOLATE)
 		remote_flow->msg.t.tcm_handle = ISOLATE_HANDLE;
+	else if (idx == TAP_REMOTE_PROMISC)
+		remote_flow->msg.t.tcm_handle = REMOTE_PROMISCUOUS_HANDLE;
 	else
 		tap_flow_set_handle(remote_flow);
 	if (priv_flow_process(pmd, attr, items, actions, NULL,
@@ -1573,12 +1580,16 @@ int tap_flow_implicit_create(struct pmd_internals *pmd,
 	}
 	err = nl_recv_ack(pmd->nlsk_fd);
 	if (err < 0) {
+		/* Silently ignore re-entering remote promiscuous rule */
+		if (errno == EEXIST && idx == TAP_REMOTE_PROMISC)
+			goto success;
 		RTE_LOG(ERR, PMD,
 			"Kernel refused TC filter rule creation (%d): %s\n",
 			errno, strerror(errno));
 		goto fail;
 	}
 	LIST_INSERT_HEAD(&pmd->implicit_flows, remote_flow, next);
+success:
 	return 0;
 fail:
 	if (remote_flow)
