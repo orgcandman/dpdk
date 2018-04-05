@@ -1135,7 +1135,7 @@ dpaa2_sec_auth_init(struct rte_cryptodev *dev,
 {
 	struct dpaa2_sec_dev_private *dev_priv = dev->data->dev_private;
 	struct alginfo authdata;
-	unsigned int bufsize, i;
+	int bufsize, i;
 	struct ctxt_priv *priv;
 	struct sec_flow_context *flc;
 
@@ -1231,6 +1231,10 @@ dpaa2_sec_auth_init(struct rte_cryptodev *dev,
 	bufsize = cnstr_shdsc_hmac(priv->flc_desc[DESC_INITFINAL].desc,
 				   1, 0, &authdata, !session->dir,
 				   session->digest_length);
+	if (bufsize < 0) {
+		DPAA2_SEC_ERR("Crypto: Invalid buffer length");
+		goto error_out;
+	}
 
 	flc->word1_sdl = (uint8_t)bufsize;
 	flc->word2_rflc_31_0 = lower_32_bits(
@@ -1261,7 +1265,7 @@ dpaa2_sec_aead_init(struct rte_cryptodev *dev,
 	struct dpaa2_sec_aead_ctxt *ctxt = &session->ext_params.aead_ctxt;
 	struct dpaa2_sec_dev_private *dev_priv = dev->data->dev_private;
 	struct alginfo aeaddata;
-	unsigned int bufsize, i;
+	int bufsize, i;
 	struct ctxt_priv *priv;
 	struct sec_flow_context *flc;
 	struct rte_crypto_aead_xform *aead_xform = &xform->aead;
@@ -1352,6 +1356,11 @@ dpaa2_sec_aead_init(struct rte_cryptodev *dev,
 				priv->flc_desc[0].desc, 1, 0,
 				&aeaddata, session->iv.length,
 				session->digest_length);
+	if (bufsize < 0) {
+		DPAA2_SEC_ERR("Crypto: Invalid buffer length");
+		goto error_out;
+	}
+
 	flc->word1_sdl = (uint8_t)bufsize;
 	flc->word2_rflc_31_0 = lower_32_bits(
 			(uint64_t)&(((struct dpaa2_sec_qp *)
@@ -1381,7 +1390,7 @@ dpaa2_sec_aead_chain_init(struct rte_cryptodev *dev,
 	struct dpaa2_sec_aead_ctxt *ctxt = &session->ext_params.aead_ctxt;
 	struct dpaa2_sec_dev_private *dev_priv = dev->data->dev_private;
 	struct alginfo authdata, cipherdata;
-	unsigned int bufsize, i;
+	int bufsize, i;
 	struct ctxt_priv *priv;
 	struct sec_flow_context *flc;
 	struct rte_crypto_cipher_xform *cipher_xform;
@@ -1573,6 +1582,10 @@ dpaa2_sec_aead_chain_init(struct rte_cryptodev *dev,
 					      ctxt->auth_only_len,
 					      session->digest_length,
 					      session->dir);
+		if (bufsize < 0) {
+			DPAA2_SEC_ERR("Crypto: Invalid buffer length");
+			goto error_out;
+		}
 	} else {
 		RTE_LOG(ERR, PMD, "Hash before cipher not supported\n");
 		goto error_out;
@@ -1664,7 +1677,7 @@ dpaa2_sec_set_ipsec_session(struct rte_cryptodev *dev,
 	struct ipsec_encap_pdb encap_pdb;
 	struct ipsec_decap_pdb decap_pdb;
 	struct alginfo authdata, cipherdata;
-	unsigned int bufsize;
+	int bufsize;
 	struct sec_flow_context *flc;
 
 	PMD_INIT_FUNC_TRACE();
@@ -1854,6 +1867,12 @@ dpaa2_sec_set_ipsec_session(struct rte_cryptodev *dev,
 				1, 0, &decap_pdb, &cipherdata, &authdata);
 	} else
 		goto out;
+
+	if (bufsize < 0) {
+		DPAA2_SEC_ERR("Crypto: Invalid buffer length");
+		goto out;
+	}
+
 	flc->word1_sdl = (uint8_t)bufsize;
 
 	/* Enable the stashing control bit */
