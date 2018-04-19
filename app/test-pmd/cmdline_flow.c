@@ -1906,6 +1906,7 @@ parse_vc(struct context *ctx, const struct token *token,
 			return -1;
 		*action = (struct rte_flow_action){
 			.type = priv->type,
+			.conf = data_size ? data : NULL,
 		};
 		++out->args.vc.actions_n;
 		ctx->object = action;
@@ -1986,7 +1987,6 @@ parse_vc_conf(struct context *ctx, const struct token *token,
 	      void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
-	struct rte_flow_action *action;
 
 	(void)size;
 	/* Token name must match. */
@@ -1995,14 +1995,9 @@ parse_vc_conf(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->args.vc.actions_n)
-		return -1;
-	action = &out->args.vc.actions[out->args.vc.actions_n - 1];
 	/* Point to selected object. */
 	ctx->object = out->args.vc.data;
 	ctx->objmask = NULL;
-	/* Update configuration pointer. */
-	action->conf = ctx->object;
 	return len;
 }
 
