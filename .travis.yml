@@ -4,5 +4,5 @@ addons:
   apt:
     packages:
       - libnuma-dev                                             # numa is a dependency
-      - linux-headers-generic                                   # get header files for travis virtual machine
+      - linux-headers-$(uname -r)                               # get header files for travis virtual machine
 script: /usr/bin/make defconfig && make all
