@@ -1,0 +1,3 @@
+language: c
+
+script: /usr/bin/make defconfig && make all
