@@ -1,3 +1,5 @@
 language: c
 
+
+before_script: sudo apt-get install libnuma-dev
 script: /usr/bin/make defconfig && make all
