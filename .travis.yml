@@ -1,5 +1,6 @@
 language: c
 
-
-before_script: sudo apt-get install libnuma-dev
+before_script:
+        - sudo apt-get install libnuma-dev                      # numa is a dependency
+        - sudo apt-get install linux-headers-`uname -r`         # get header files for travis virtual machine
 script: /usr/bin/make defconfig && make all
