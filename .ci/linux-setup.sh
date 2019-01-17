@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pip install --user --upgrade meson
+pip install --upgrade meson
