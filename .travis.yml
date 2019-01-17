@@ -3,6 +3,12 @@ compiler:
   - gcc
   - clang
 
+python:
+  - 2.7
+  - 3.4
+  - 3.5
+  - 3.6
+
 os:
   - linux
 
@@ -11,8 +17,6 @@ addons:
     packages:
       - libnuma-dev
       - linux-headers-$(uname -r)
-      - python3-pip
-      - python3.6
 
 before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
 
