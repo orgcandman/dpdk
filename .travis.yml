@@ -1,4 +1,6 @@
-language: c
+language: 
+  - c
+  - python
 compiler:
   - gcc
   - clang
@@ -12,6 +14,9 @@ addons:
       - libnuma-dev
       - linux-headers-$(uname -r)
 
+python: 3.5
+
+
 before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
 
 sudo: false
@@ -24,8 +29,6 @@ env:
 matrix:
   include:
     - compiler: clang
-    - language: python
-      python: 3.5
 
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh $OPTS
 
