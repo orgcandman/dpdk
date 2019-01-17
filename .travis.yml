@@ -1,8 +1,34 @@
 language: c
+compiler:
+  - gcc
+  - clang
+
+os:
+  - linux
 
 addons:
   apt:
     packages:
-      - libnuma-dev                                             # numa is a dependency
-      - linux-headers-$(uname -r)                               # get header files for travis virtual machine
-script: /usr/bin/make defconfig && make all
+      - libnuma-dev
+      - linux-headers-$(uname -r)
+
+before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
+
+sudo: false
+
+env:
+  - SHARED=1
+  - SHARED=0
+  - KERNEL=1
+
+matrix:
+  include:
+    - compiler: clang
+
+script: ./.ci/${TRAVIS_OS_NAME}-build.sh $OPTS
+
+notifications:
+  email:
+    recipients:
+      - test-report@dpdk.org
+
