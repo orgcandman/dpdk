@@ -26,6 +26,9 @@ env:
 matrix:
   include:
     - compiler: clang
+    - python: 3.5
+      env:
+      - TOXENV=py35
 
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh $OPTS
 
