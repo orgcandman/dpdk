@@ -3,8 +3,6 @@ compiler:
   - gcc
   - clang
 
-python: 3.5
-
 os:
   - linux
 
@@ -26,13 +24,12 @@ env:
 matrix:
   include:
     - compiler: clang
-    - python: 3.5
-      env:
-      - TOXENV=py35
+    - language: python
+      python: 3.5
 
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh $OPTS
 
-notifications:
-  email:
-    recipients:
-      - test-report@dpdk.org
+#notifications:
+#  email:
+#    recipients:
+            #- test-report@dpdk.org
