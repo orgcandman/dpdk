@@ -31,4 +31,3 @@ notifications:
   email:
     recipients:
       - test-report@dpdk.org
-
