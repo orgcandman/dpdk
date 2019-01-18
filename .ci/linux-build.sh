@@ -9,7 +9,11 @@ if [ "${CC}" == "clang" ]
 then
 	make config T=x86_64-native-linuxapp-clang
 elif [ "${CC}" == "gcc" ]
+then
 	make config T=x86_64-native-linuxapp-gcc
+else
+	echo "compiler env variable not set"
+	exit 1
 fi
 
 make all
