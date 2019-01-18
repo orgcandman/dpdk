@@ -9,12 +9,15 @@ os:
 
 addons:
   apt:
+    sources:
+      - deadsnakes #source for python 3.5
     packages:
       - libnuma-dev
       - linux-headers-$(uname -r)
+      - python3.5
 
 #python: 3.5
-env: PYTHON=3.5
+#env: PYTHON=3.5
 
 before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
 
