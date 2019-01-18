@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pip install --upgrade meson
+python3.5 -m pip install --upgrade meson
