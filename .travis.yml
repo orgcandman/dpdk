@@ -18,6 +18,7 @@ addons:
       - python3.5-venv
       - python3.5-doc
       - python3-pip
+      - clang
 
 #python: 3.5
 #env: PYTHON=3.5
