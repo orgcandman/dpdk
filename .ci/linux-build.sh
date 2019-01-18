@@ -4,7 +4,8 @@
 # setup the right options depending on the environment variables
 # run the build
 
-#TODO: check if CC == "", exit with some error
+
+CC=clang #force it for testing. having trouble with travis
 if [ "${CC}" == "clang" ]
 then
 	make config T=x86_64-native-linuxapp-clang
