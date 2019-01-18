@@ -4,7 +4,7 @@
 # setup the right options depending on the environment variables
 # run the build
 
-
+echo $@
 CC=clang #force it for testing. having trouble with travis
 if [ "${CC}" == "clang" ]
 then
