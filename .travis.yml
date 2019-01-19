@@ -14,7 +14,6 @@ addons:
       - libnuma-dev
       - linux-headers-$(uname -r)
       - python3.5
-      - python3.5-venv
       - python3-pip
 
 before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
