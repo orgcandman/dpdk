@@ -17,7 +17,10 @@ set_conf() {
 }
 
 
-if [ "${MAKE}" == "1" ]; then
+if [ "${NINJABUILD}" == "1" ]; then
+    meson build
+    ninja -C build
+else
     make config T=x86_64-native-linuxapp-${CC}
     if [ "${SHARED}" == "1" ]; then
         set_conf build CONFIG_RTE_BUILD_SHARED_LIB y
@@ -28,7 +31,4 @@ if [ "${MAKE}" == "1" ]; then
     fi
 
     make all
-else
-    meson build
-    ninja -C build
 fi

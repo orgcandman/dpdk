@@ -10,6 +10,7 @@ addons:
   apt:
     sources:
       - deadsnakes #source for python 3.5
+      - mstipicevic/ninja-build-1-7-2
     packages:
       - libnuma-dev
       - linux-headers-$(uname -r)
@@ -23,11 +24,8 @@ sudo: false
 
 env:
   - SHARED=1
-  - SHARED=0
   - KERNEL=1
-  - KERNEL=0
-  - MAKE=1
-  - MAKE=0
+  - NINJABUILD=1
 
 matrix:
   include:
