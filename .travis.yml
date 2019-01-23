@@ -15,6 +15,7 @@ addons:
       - linux-headers-$(uname -r)
       - python3.5
       - python3-pip
+      - ninja-build
 
 before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
 
@@ -24,12 +25,15 @@ env:
   - SHARED=1
   - SHARED=0
   - KERNEL=1
+  - KERNEL=0
+  - MAKE=1
+  - MAKE=0
 
 matrix:
   include:
     - compiler: clang
 
-script: ./.ci/${TRAVIS_OS_NAME}-build.sh $OPTS
+script: ./.ci/${TRAVIS_OS_NAME}-build.sh
 
 notifications:
   email:
