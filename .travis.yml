@@ -1,0 +1,39 @@
+language: c
+compiler:
+  - gcc
+  - clang
+
+os:
+  - linux
+
+addons:
+  apt:
+    sources:
+      - deadsnakes #source for python 3.5
+      - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+    packages:
+      - libnuma-dev
+      - linux-headers-$(uname -r)
+      - python3.5
+      - python3-pip
+      - ninja-build
+
+before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
+
+sudo: false
+
+env:
+  - SHARED=1
+  - KERNEL=1
+  - NINJABUILD=1
+
+matrix:
+  include:
+    - compiler: clang
+
+script: ./.ci/${TRAVIS_OS_NAME}-build.sh
+
+notifications:
+  email:
+    recipients:
+      - test-report@dpdk.org
