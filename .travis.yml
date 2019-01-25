@@ -27,21 +27,24 @@ env:
   - KERNEL=1
   - NINJABUILD=1
 
-- addons:
-    apt:
-      packages:
-        - *required_deps
-        - libbsd-dev
-- addons:
-    apt:
-      packages:
-        - *required_deps
-        - libpcap-dev
-- addons:
-    apt:
-      packages:
-        - *required_deps
-        - libcrypto++-dev
+
+matrix:
+  include:               
+    - addons:
+        apt:
+          packages:
+            - *required_deps
+            - libbsd-dev
+    - addons:
+        apt:
+          packages:
+            - *required_deps
+            - libpcap-dev
+    - addons:
+        apt:
+          packages:
+            - *required_deps
+            - libcrypto++-dev
 
 
 
