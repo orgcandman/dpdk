@@ -22,10 +22,10 @@ before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
 
 sudo: false
 
-env:
-  - SHARED=1
-  - KERNEL=1
-  - NINJABUILD=1
+#env:
+#  - SHARED=1
+#  - KERNEL=1
+#  - NINJABUILD=1
 
 
 matrix:
