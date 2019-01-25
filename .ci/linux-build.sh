@@ -18,7 +18,19 @@ set_conf() {
 
 
 if [ "${NINJABUILD}" == "1" ]; then
-    meson build
+    OPTS=""
+
+    DEF_LIB="static"
+    if [ "${SHARED}" == "1" ]; then
+        DEF_LIB="shared"
+    fi
+    
+    if [ "${KERNEL}" == "1" ]; then
+        OPTS="-Denable_kmods"
+    fi
+
+    OPTS="$OPTS --default-library=$DEF_LIB"
+    meson build --werror -Dexamples=all ${OPTS}
     ninja -C build
 else
     make config T=x86_64-native-linuxapp-${CC}

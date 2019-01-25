@@ -8,44 +8,36 @@ os:
 
 addons:
   apt:
-    packages: &required_deps
-      - libnuma-dev
-      - linux-headers-$(uname -r)
+    sources:
+      - deadsnakes #source for python 3.5
+      - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+    packages:
+      - [python3.5, python3-pip, ninja-build, libnuma-dev, linux-headers-$(uname -r)]
 
 before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
 
 sudo: false
 
-#env:
-#  - SHARED=1
-#  - KERNEL=1
-#  - NINJABUILD=1
+env:
+  - SHARED=1
+  - KERNEL=1
+  - NINJABUILD=1
 
 
 matrix:
   include:
     - compiler: gcc
+    - compiler: clang
+    - compiler: gcc
       addons:
-          apt:
-            packages:
-              - *required_deps
-              - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+        apt:
+          packages:
+            - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
     - compiler: clang
       addons:
-          apt:
-            packages:
-              - *required_deps
-              - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
-    - env: NINJABUILD=1
-      addons:
-          apt:
-            sources:
-              - deadsnakes #source for python 3.5
-              - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
-            packages:
-              - *required_deps
-              - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
-              - [python3.5, python3-pip, ninja-build]
+        apt:
+          packages:
+            - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
 
 
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh
