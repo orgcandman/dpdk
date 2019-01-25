@@ -42,12 +42,12 @@ matrix:
             packages:
               - *required_deps
               - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
-    - env: NINJABUILD=1
-        addons:
-          apt:
-            packages:
-              - *required_deps
-              - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+                #    - env: NINJABUILD=1
+                #   addons:
+                #         apt:
+                #    packages:
+                #   - *required_deps
+                #   - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
 
 
 
