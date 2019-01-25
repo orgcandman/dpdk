@@ -8,9 +8,6 @@ os:
 
 addons:
   apt:
-    sources:
-      - deadsnakes #source for python 3.5
-      - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
     packages: &required_deps
       - libnuma-dev
       - linux-headers-$(uname -r)
@@ -45,9 +42,13 @@ matrix:
     - env: NINJABUILD=1
       addons:
           apt:
+            sources:
+              - deadsnakes #source for python 3.5
+              - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
             packages:
               - *required_deps
               - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+              - [python3.5, python3-pip, ninja-build]
 
 
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh
