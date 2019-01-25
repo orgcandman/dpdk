@@ -29,22 +29,25 @@ sudo: false
 
 
 matrix:
-  include:               
-    - addons:
-        apt:
-          packages:
-            - *required_deps
-            - [libbsd-dev, libpcap-dev]
-    - addons:
-        apt:
-          packages:
-            - *required_deps
-            - libpcap-dev
-    - addons:
-        apt:
-          packages:
-            - *required_deps
-            - libcrypto++-dev
+  include:
+    - compiler: gcc
+        addons:
+          apt:
+            packages:
+              - *required_deps
+              - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+    - compiler: clang
+        addons:
+          apt:
+            packages:
+              - *required_deps
+              - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+    - env: NINJABUILD=1
+        addons:
+          apt:
+            packages:
+              - *required_deps
+              - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
 
 
 
