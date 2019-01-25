@@ -50,7 +50,6 @@ matrix:
                 #   - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
 
 
-
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh
 
 notifications:
