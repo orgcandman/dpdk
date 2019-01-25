@@ -34,7 +34,7 @@ matrix:
         apt:
           packages:
             - *required_deps
-            - libbsd-dev
+            - [libbsd-dev, libpcap-dev]
     - addons:
         apt:
           packages:
