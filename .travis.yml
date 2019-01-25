@@ -31,13 +31,13 @@ sudo: false
 matrix:
   include:
     - compiler: gcc
-      - addons:
+    - addons:
           apt:
             packages:
               - *required_deps
               - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
     - compiler: clang
-      - addons:
+    - addons:
           apt:
             packages:
               - *required_deps
