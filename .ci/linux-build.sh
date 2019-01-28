@@ -28,6 +28,8 @@ if [ "${NINJABUILD}" == "1" ]; then
     dpkg -l
 
     apt-cache search linux-virtual
+    apt show linux-libc-dev
+    apt show linux-headers-virtual
 
     OPTS=""
 
