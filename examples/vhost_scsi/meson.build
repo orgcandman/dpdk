@@ -9,6 +9,12 @@
 if host_machine.system() != 'linux'
 	build = false
 endif
+
+cxx = meson.get_compiler('cpp')
+if !cxx.has_header('virtio_scsi.h')
+	build = false
+endif
+
 deps += 'vhost'
 cflags += ['-D_FILE_OFFSET_BITS=64']
 sources = files(
