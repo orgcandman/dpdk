@@ -21,7 +21,13 @@ if [ "${NINJABUILD}" == "1" ]; then
     ls -lah /lib/modules/$(uname -r)/build
     ls -lah /lib/modules/$(uname -r)/build/
 
+    echo "Finding virtio_scsi.h"
     find /lib/modules/ -name virtio_scsi.h
+    echo "done..."
+
+    dpkg -l
+
+    apt-cache search linux-virtual
 
     OPTS=""
 
