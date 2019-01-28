@@ -10,8 +10,8 @@ if host_machine.system() != 'linux'
 	build = false
 endif
 
-cxx = meson.get_compiler('cpp')
-if !cxx.has_header('virtio_scsi.h')
+cxx = meson.get_compiler('c')
+if not cxx.has_header('virtio_scsi.h')
 	build = false
 endif
 
