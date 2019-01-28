@@ -18,6 +18,11 @@ set_conf() {
 
 
 if [ "${NINJABUILD}" == "1" ]; then
+    ls -lah /lib/modules/$(uname -r)/build
+    ls -lah /lib/modules/$(uname -r)/build/
+
+    find /lib/modules/ -name virtio_scsi.h
+
     OPTS=""
 
     DEF_LIB="static"

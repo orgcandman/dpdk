@@ -45,6 +45,6 @@ script: ./.ci/${TRAVIS_OS_NAME}-build.sh
 notifications:
   email:
     recipients:
-      - test-report@dpdk.org
+      - aconole@bytheb.org
 
 
