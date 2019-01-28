@@ -12,7 +12,7 @@ addons:
       - deadsnakes #source for python 3.5
       - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
     packages:
-      - [python3.5, python3-pip, ninja-build, libnuma-dev, linux-headers-$(uname -r)]
+      - [python3.5, python3-pip, ninja-build, libnuma-dev, linux-headers-$(uname -r), linux-headers-virtual]
 
 before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
 
