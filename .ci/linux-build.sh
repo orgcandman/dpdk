@@ -25,11 +25,9 @@ if [ "${NINJABUILD}" == "1" ]; then
     find /lib/modules/ -name virtio_scsi.h
     echo "done..."
 
-    dpkg -l
-
     apt-cache search linux-virtual
-    apt show linux-libc-dev
-    apt show linux-headers-virtual
+    apt show -a linux-libc-dev
+    apt show -a linux-headers-virtual
 
     OPTS=""
 
