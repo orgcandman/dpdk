@@ -1,0 +1,160 @@
+language: c
+compiler:
+  - gcc
+  - clang
+
+os:
+  - linux
+
+addons:
+  apt:
+    sources:
+      - deadsnakes #source for python 3.5
+      - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+    packages:
+      - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+
+before_install: ./.ci/${TRAVIS_OS_NAME}-setup.sh
+
+sudo: false
+
+env:
+  - SHARED=1
+  - KERNEL=1
+  - SHARED=1 KERNEL=1
+  - NINJABUILD=1
+  - NINJABUILD=1 SHARED=1
+  - NINJABUILD=1 KERNEL=1
+  - NINJABUILD=1 SHARED=1 KERNEL=1
+
+matrix:
+  include:
+  - env: SHARED=1
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+  - env: KERNEL=1
+    compiler: gcc
+    addons: 
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+  - env: SHARED=1 KERNEL=1
+    compiler: gcc
+    addons: 
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+  - env: SHARED=1
+    compiler: clang
+    addons: 
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+  - env: KERNEL=1
+    compiler: clang
+    addons: 
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+  - env: SHARED=1 KERNEL=1
+    compiler: clang
+    addons: 
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+  - env: ARM64=1
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), libtool, python3.5, python3-pip]
+  - env: ARM64=1 NINJABUILD=1
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [linux-headers-$(uname -r), libtool, python3.5, python3-pip, ninja-build]
+  - env: NINJABUILD=1
+    compiler: gcc
+    addons: 
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+  - env: NINJABUILD=1 SHARED=1
+    compiler: gcc
+    addons: 
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+  - env: NINJABUILD=1 KERNEL=1
+    compiler: gcc
+    addons: 
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+  - env: NINJABUILD=1 SHARED=1 KERNEL=1
+    compiler: gcc
+    addons: 
+      apt:
+        sources:
+          - deadsnakes #source for python 3.5
+          - sourceline: 'ppa:mstipicevic/ninja-build-1-7-2'
+        packages:
+          - [libbsd-dev, libpcap-dev, libcrypto++-dev, libjansson4]
+          - [libnuma-dev, linux-headers-$(uname -r), python3.5, python3-pip, ninja-build]
+
+
+script: ./.ci/${TRAVIS_OS_NAME}-build.sh
+
+notifications:
+  email:
+    recipients:
+      - test-report@dpdk.org
+
