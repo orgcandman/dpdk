@@ -336,10 +336,13 @@ if get_option('tests')
 	timeout_seconds = 600
 	timeout_seconds_fast = 10
 
+	# Retreive the number of CPU cores
+	num_cores = run_command('lscpu', '-p=cpu').stdout().strip().split('\n')[-1]
+        num_cores_arg = '-l 0-' + num_cores
 	foreach arg : fast_parallel_test_names
 		test(arg, dpdk_test,
 			env : ['DPDK_TEST=' + arg],
-			args : ['-c f','-n 4', '--file-prefix=@0@'.format(arg)],
+			args : [num_cores_arg,'-n 4', '--file-prefix=@0@'.format(arg)],
 			timeout : timeout_seconds_fast,
 			suite : 'fast-tests')
 	endforeach
