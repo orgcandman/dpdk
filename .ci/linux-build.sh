@@ -19,7 +19,7 @@ if [ "${AARCH64}" == "1" ]; then
     RUN_TESTS="no"
 fi
 
-OPTS="$OPTS --default-library=$DEF_LIB"
+OPTS="$OPTS --default-library=$DEF_LIB -Dtest_set_no_huge=true"
 meson build --werror -Dexamples=all ${OPTS}
 ninja -C build
 
