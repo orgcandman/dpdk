@@ -5,7 +5,7 @@ project('DPDK', 'C',
 	version: '19.05.0-rc0',
 	license: 'BSD',
 	default_options: ['buildtype=release', 'default_library=static'],
-	meson_version: '>= 0.47.1'
+	meson_version: '>= 0.48'
 )
 
 # set up some global vars for compiler, platform, configuration, etc.
