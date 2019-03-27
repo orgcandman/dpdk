@@ -341,6 +341,10 @@ if get_option('tests')
         num_cores_arg = '-l 0-' + num_cores
 
 	test_args = [num_cores_arg, '-n 4']
+	if get_option('tests_no_huge')
+		test_args += '--no-huge'
+	endif
+
 	foreach arg : fast_parallel_test_names
 		test(arg, dpdk_test,
 			env : ['DPDK_TEST=' + arg],
