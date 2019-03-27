@@ -22,3 +22,10 @@ fi
 OPTS="$OPTS --default-library=$DEF_LIB"
 meson build --werror -Dexamples=all $OPTS
 ninja -C build
+
+if [ "$AARCH64" != "1" ]; then
+    sudo meson test -C build --suite fast-tests
+    sudo meson test -C build --suite perf-tests
+    sudo meson test -C build --suite driver-tests
+    sudo meson test -C build --suite debug-tests
+fi
