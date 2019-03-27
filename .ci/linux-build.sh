@@ -20,5 +20,12 @@ if [ "$AARCH64" = "1" ]; then
 fi
 
 OPTS="$OPTS --default-library=$DEF_LIB"
-meson build --werror -Dexamples=all $OPTS
+meson build --werror -Dexamples=all -Dtests_no_huge=true $OPTS
 ninja -C build
+
+if [ "$AARCH64" != "1" ]; then
+    meson test -C build --suite fast-tests
+    meson test -C build --suite perf-tests
+    meson test -C build --suite driver-tests
+    meson test -C build --suite debug-tests
+fi
