@@ -170,7 +170,6 @@ fast_parallel_test_names = [
         'red_autotest',
         'ring_autotest',
         'ring_pmd_autotest',
-        'rwlock_autotest',
         'sched_autotest',
         'spinlock_autotest',
         'string_autotest',
@@ -213,15 +212,21 @@ fast_non_parallel_test_names = [
         'thash_autotest',
 ]
 
+# These test cases are non-parallel and also take > 10m to execute in
+# some environments (such as CI systems), so allow deselecting them
+slow_test_names = [
+        'rwlock_autotest',
+	'mempool_perf_autotest',
+	'reciprocal_division',
+        'reciprocal_division_perf',
+]
+
 # All test cases in perf_test_names list are non-parallel
 perf_test_names = [
         'ring_perf_autotest',
-        'mempool_perf_autotest',
         'memcpy_perf_autotest',
         'hash_perf_autotest',
         'timer_perf_autotest',
-        'reciprocal_division',
-        'reciprocal_division_perf',
         'lpm_perf_autotest',
         'red_all',
         'barrier_autotest',
@@ -331,7 +336,7 @@ if get_option('tests')
 		install_rpath: driver_install_path,
 		install: false)
 
-	# some perf tests (eg: memcpy perf autotest)take very long
+	# some tests (eg: the slow tests) take very long
 	# to complete, so timeout to 10 minutes
 	timeout_seconds = 600
 	timeout_seconds_fast = 10
@@ -362,13 +367,22 @@ if get_option('tests')
 			suite : 'fast-tests')
 	endforeach
 
+	foreach arg : slow_test_names
+		test(arg, dpdk_test,
+			env : ['DPDK_TEST=' + arg],
+			args : test_args + ['--file-prefix=@0@'.format(arg)],
+			timeout : timeout_seconds,
+			is_parallel : false,
+			suite : 'slow-tests')
+	endforeach
+
 	foreach arg : perf_test_names
 		test(arg, dpdk_test,
-		env : ['DPDK_TEST=' + arg],
-		args : test_args + ['--file-prefix=@0@'.format(arg)],
-		timeout : timeout_seconds,
-		is_parallel : false,
-		suite : 'perf-tests')
+			env : ['DPDK_TEST=' + arg],
+			args : test_args + ['--file-prefix=@0@'.format(arg)],
+			timeout : timeout_seconds,
+			is_parallel : false,
+			suite : 'perf-tests')
 	endforeach
 
 	foreach arg : driver_test_names
