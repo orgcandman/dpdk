@@ -408,6 +408,9 @@ test_classify(void)
 		return -1;
 	}
 
+	/* Always use the scalar testing for now. */
+	rte_acl_set_ctx_classify(acx, RTE_ACL_CLASSIFY_SCALAR);
+
 	ret = 0;
 	for (i = 0; i != TEST_CLASSIFY_ITER; i++) {
 
@@ -547,6 +550,7 @@ test_build_ports_range(void)
 	for (i = 0; i != RTE_DIM(test_data); i++)
 		data[i] = (uint8_t *)&test_data[i];
 
+	rte_acl_set_ctx_classify(acx, RTE_ACL_CLASSIFY_SCALAR);
 	for (i = 0; i != RTE_DIM(test_rules); i++) {
 		rte_acl_reset(acx);
 		ret = test_classify_buid(acx, test_rules, i + 1);
@@ -910,6 +914,8 @@ test_convert_rules(const char *desc,
 		printf("Line %i: Error creating ACL context!\n", __LINE__);
 		return -1;
 	}
+
+	rte_acl_set_ctx_classify(acx, RTE_ACL_CLASSIFY_SCALAR);
 
 	rc = convert_rules(acx, convert, acl_test_rules,
 		RTE_DIM(acl_test_rules));
@@ -1352,7 +1358,7 @@ test_invalid_parameters(void)
 	struct rte_acl_param param;
 	struct rte_acl_ctx *acx;
 	struct rte_acl_ipv4vlan_rule rule;
-	int result;
+	int i, result;
 
 	uint32_t layout[RTE_ACL_IPV4VLAN_NUM] = {0};
 
@@ -1513,45 +1519,25 @@ test_invalid_parameters(void)
 		return -1;
 	}
 
-	/* SSE classify test */
+	for (i = RTE_ACL_CLASSIFY_DEFAULT; i < RTE_ACL_CLASSIFY_NUM; ++i) {
+		rte_acl_set_ctx_classify(acx, i); /* set up the classify code */
 
-	/* cover zero categories in classify (should not fail) */
-	result = rte_acl_classify(acx, NULL, NULL, 0, 0);
-	if (result != 0) {
-		printf("Line %i: SSE classify with zero categories "
-				"failed!\n", __LINE__);
-		rte_acl_free(acx);
-		return -1;
-	}
+		/* cover zero categories in classify (should not fail) */
+		result = rte_acl_classify(acx, NULL, NULL, 0, 0);
+		if (result != 0 && result != -ENOTSUP) {
+			printf("AGL: %d, ACL classify with zero categories failed: %d!\n",
+			       i, result);
+			return -1;
+		}
 
-	/* cover invalid but positive categories in classify */
-	result = rte_acl_classify(acx, NULL, NULL, 0, 3);
-	if (result == 0) {
-		printf("Line %i: SSE classify with 3 categories "
-				"should have failed!\n", __LINE__);
-		rte_acl_free(acx);
-		return -1;
-	}
-
-	/* scalar classify test */
-
-	/* cover zero categories in classify (should not fail) */
-	result = rte_acl_classify_alg(acx, NULL, NULL, 0, 0,
-		RTE_ACL_CLASSIFY_SCALAR);
-	if (result != 0) {
-		printf("Line %i: Scalar classify with zero categories "
-				"failed!\n", __LINE__);
-		rte_acl_free(acx);
-		return -1;
-	}
-
-	/* cover invalid but positive categories in classify */
-	result = rte_acl_classify(acx, NULL, NULL, 0, 3);
-	if (result == 0) {
-		printf("Line %i: Scalar classify with 3 categories "
-				"should have failed!\n", __LINE__);
-		rte_acl_free(acx);
-		return -1;
+		/* cover invalid but positive categories in classify */
+		result = rte_acl_classify(acx, NULL, NULL, 0, 3);
+		/* we don't check for -ENOTSUP here, since it is a failure */
+		if (result == 0) {
+			printf("AGL: %d, ACL classify with 3 categories should fail!\n",
+			       i);
+			return -1;
+		}
 	}
 
 	/* free ACL context */
