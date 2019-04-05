@@ -27,5 +27,8 @@ if arch_subdir == 'x86'
 		objs += avx2_tmplib.extract_objects('acl_run_avx2.c')
 		cflags += '-DCC_AVX2_SUPPORT'
 	endif
-
+elif arch_subdir == 'arm' and host_machine.cpu_family().startswith('aarch64')
+	sources += files('acl_run_neon.c')
+elif arch_subdir == 'ppc_64'
+	sources += files('acl_run_altivec.c')
 endif
