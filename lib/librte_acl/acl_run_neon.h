@@ -112,37 +112,41 @@ transition4(int32x4_t next_input, const uint64_t *trans, uint64_t transitions[])
 	index_msk = vld1q_u32((const uint32_t *)&neon_acl_const.xmm_index_mask);
 
 	/* Calc node type and node addr */
-	node_type = vbicq_s32(tr_hi_lo.val[0], index_msk);
-	addr = vandq_s32(tr_hi_lo.val[0], index_msk);
+	node_type = (uint32x4_t) vbicq_s32(tr_hi_lo.val[0],
+				       (int32x4_t)index_msk);
+	addr = (uint32x4_t) vandq_s32(tr_hi_lo.val[0], (int32x4_t) index_msk);
 
 	/* t = 0 */
-	t = veorq_s32(node_type, node_type);
+	t = veorq_s32((int32x4_t)node_type, (int32x4_t)node_type);
 
 	/* mask for DFA type(0) nodes */
-	dfa_msk = vceqq_u32(node_type, t);
+	dfa_msk = vceqq_u32(node_type, (uint32x4_t)t);
 
-	mask = vld1q_s32((const int32_t *)&neon_acl_const.xmm_shuffle_input);
-	in = vqtbl1q_u8((uint8x16_t)next_input, (uint8x16_t)mask);
+	mask = (uint32x4_t)
+	       vld1q_s32((const int32_t *)&neon_acl_const.xmm_shuffle_input);
+	in = (int32x4_t) vqtbl1q_u8((uint8x16_t)next_input, (uint8x16_t)mask);
 
 	/* DFA calculations. */
-	r = vshrq_n_u32(in, 30); /* div by 64 */
-	mask = vld1q_s32((const int32_t *)&neon_acl_const.range_base);
-	r = vaddq_u8(r, mask);
-	t = vshrq_n_u32(in, 24);
-	r = vqtbl1q_u8((uint8x16_t)tr_hi_lo.val[1], (uint8x16_t)r);
-	dfa_ofs = vsubq_s32(t, r);
+	r = (int32x4_t) vshrq_n_u32((uint32x4_t) in, 30); /* div by 64 */
+	mask = (uint32x4_t)
+	       vld1q_s32((const int32_t *)&neon_acl_const.range_base);
+	r = (int32x4_t) vaddq_u8((uint8x16_t)r, (uint8x16_t)mask);
+	t = (int32x4_t) vshrq_n_u32((uint32x4_t)in, 24);
+	r = (int32x4_t) vqtbl1q_u8((uint8x16_t)tr_hi_lo.val[1], (uint8x16_t)r);
+	dfa_ofs = (uint32x4_t) vsubq_s32(t, r);
 
 	/* QUAD/SINGLE calculations. */
-	t = vcgtq_s8(in, tr_hi_lo.val[1]);
-	t = vabsq_s8(t);
-	t = vpaddlq_u8(t);
-	quad_ofs = vpaddlq_u16(t);
+	t = (int32x4_t) vcgtq_s8((int8x16_t)in, (int8x16_t)tr_hi_lo.val[1]);
+	t = (int32x4_t) vabsq_s8((int8x16_t)t);
+	t = (int32x4_t) vpaddlq_u8((uint8x16_t)t);
+	quad_ofs = vpaddlq_u16((uint16x8_t)t);
 
 	/* blend DFA and QUAD/SINGLE. */
-	t = vbslq_u8(dfa_msk, dfa_ofs, quad_ofs);
+	t = (int32x4_t) vbslq_u8((uint8x16_t)dfa_msk, (uint8x16_t)dfa_ofs,
+				 (uint8x16_t)quad_ofs);
 
 	/* calculate address for next transitions */
-	addr = vaddq_u32(addr, t);
+	addr = vaddq_u32(addr, (uint32x4_t)t);
 
 	/* Fill next transitions */
 	transitions[0] = trans[vgetq_lane_u32(addr, 0)];
@@ -150,7 +154,7 @@ transition4(int32x4_t next_input, const uint64_t *trans, uint64_t transitions[])
 	transitions[2] = trans[vgetq_lane_u32(addr, 2)];
 	transitions[3] = trans[vgetq_lane_u32(addr, 3)];
 
-	return vshrq_n_u32(next_input, CHAR_BIT);
+	return (int32x4_t) vshrq_n_u32((uint32x4_t)next_input, CHAR_BIT);
 }
 
 /*
@@ -178,6 +182,9 @@ search_neon_8(const struct rte_acl_ctx *ctx, const uint8_t **data,
 	 /* Check for any matches. */
 	acl_match_check_x4(0, ctx, parms, &flows, &index_array[0]);
 	acl_match_check_x4(4, ctx, parms, &flows, &index_array[4]);
+
+	memset(&input0, 0, sizeof(input0));
+	memset(&input1, 0, sizeof(input1));
 
 	while (flows.started > 0) {
 		/* Gather 4 bytes of input data for each stream. */
@@ -240,6 +247,7 @@ search_neon_4(const struct rte_acl_ctx *ctx, const uint8_t **data,
 	/* Check for any matches. */
 	acl_match_check_x4(0, ctx, parms, &flows, index_array);
 
+	memset(&input, 0, sizeof(input));
 	while (flows.started > 0) {
 		/* Gather 4 bytes of input data for each stream. */
 		input = vsetq_lane_s32(GET_NEXT_4BYTES(parms, 0), input, 0);
