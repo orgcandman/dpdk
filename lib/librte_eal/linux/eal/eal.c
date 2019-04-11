@@ -1334,3 +1334,5 @@ rte_eal_check_module(const char *module_name)
 	/* Module has been found */
 	return 1;
 }
+
+#warn Break yoself
