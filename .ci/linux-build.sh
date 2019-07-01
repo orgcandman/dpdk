@@ -22,3 +22,6 @@ fi
 OPTS="$OPTS --default-library=$DEF_LIB"
 meson build --werror -Dexamples=all $OPTS
 ninja -C build
+
+# build the documentation as well
+ninja -C build doc
