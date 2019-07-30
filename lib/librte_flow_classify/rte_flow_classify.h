@@ -205,6 +205,34 @@ rte_flow_classify_table_create(struct rte_flow_classifier *cls,
  */
 __rte_experimental
 int
+rte_flow_classify_validate_l(struct rte_flow_classifier *cls,
+			     const struct rte_flow_attr *attr,
+			     const struct rte_flow_item pattern[],
+			     const size_t pattern_l,
+			     const struct rte_flow_action actions[],
+			     const size_t actions_l,
+			     struct rte_flow_error *error);
+
+
+/**
+ * Flow classify validate
+ *
+ * @param cls
+ *   Handle to flow classifier instance
+ * @param[in] attr
+ *   Flow rule attributes
+ * @param[in] pattern
+ *   Pattern specification (list terminated by the END pattern item).
+ * @param[in] actions
+ *   Associated actions (list terminated by the END pattern item).
+ * @param[out] error
+ *   Perform verbose error reporting if not NULL. Structure
+ *   initialised in case of error only.
+ * @return
+ *   0 on success, error code otherwise
+ */
+__rte_experimental
+int
 rte_flow_classify_validate(struct rte_flow_classifier *cls,
 		const struct rte_flow_attr *attr,
 		const struct rte_flow_item pattern[],

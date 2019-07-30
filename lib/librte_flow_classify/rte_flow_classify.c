@@ -89,18 +89,51 @@ struct rte_flow_classify_rule {
 	void *entry_ptr; /* handle to the table entry for rule meta data */
 };
 
+static size_t
+calc_flow_item_alen(const struct rte_flow_item pattern[])
+{
+	size_t i = 0;
+	while (pattern && (pattern + i)->type != RTE_FLOW_ITEM_TYPE_END)
+		i++;
+	return i + 1;
+}
+
+static size_t
+calc_flow_action_alen(const struct rte_flow_action actions[])
+{
+	size_t i = 0;
+	while (actions && (actions + i)->type != RTE_FLOW_ACTION_TYPE_END)
+		i++;
+	return i + 1;
+}
+
 int
-rte_flow_classify_validate(
-		   struct rte_flow_classifier *cls,
-		   const struct rte_flow_attr *attr,
-		   const struct rte_flow_item pattern[],
-		   const struct rte_flow_action actions[],
-		   struct rte_flow_error *error)
+rte_flow_classify_validate(struct rte_flow_classifier *cls,
+			   const struct rte_flow_attr *attr,
+			   const struct rte_flow_item pattern[],
+			   const struct rte_flow_action actions[],
+			   struct rte_flow_error *error)
+{
+	return rte_flow_classify_validate_l(cls, attr, pattern,
+					    calc_flow_item_alen(pattern),
+					    actions,
+					    calc_flow_action_alen(actions),
+					    error);
+}
+
+int
+rte_flow_classify_validate_l(struct rte_flow_classifier *cls,
+			     const struct rte_flow_attr *attr,
+			     const struct rte_flow_item pattern[],
+			     size_t pattern_l,
+			     const struct rte_flow_action actions[],
+			     size_t actions_l,
+			     struct rte_flow_error *error)
 {
 	struct rte_flow_item *items;
 	parse_filter_t parse_filter;
 	uint32_t item_num = 0;
-	uint32_t i = 0;
+	size_t i = 0;
 	int ret;
 
 	if (error == NULL)
@@ -134,17 +167,37 @@ rte_flow_classify_validate(
 		return -EINVAL;
 	}
 
+	while (i < actions_l && (actions + i)->type != RTE_FLOW_ACTION_TYPE_END)
+		i++;
+
+	if (i == actions_l) {
+		rte_flow_error_set(error, EINVAL,
+				   RTE_FLOW_ERROR_TYPE_ACTION_NUM,
+				   NULL, "Actions without end marker.");
+		return -EINVAL;
+	}
+
+	i = 0;
+
 	memset(&cls->ntuple_filter, 0, sizeof(cls->ntuple_filter));
 
 	/* Get the non-void item number of pattern */
-	while ((pattern + i)->type != RTE_FLOW_ITEM_TYPE_END) {
+	while (i < pattern_l && (pattern + i)->type != RTE_FLOW_ITEM_TYPE_END) {
 		if ((pattern + i)->type != RTE_FLOW_ITEM_TYPE_VOID)
 			item_num++;
 		i++;
 	}
+
 	item_num++;
 
-	items = malloc(item_num * sizeof(struct rte_flow_item));
+	if (i == pattern_l) {
+		rte_flow_error_set(error, EINVAL,
+				   RTE_FLOW_ERROR_TYPE_ITEM,
+				   NULL, "Pattern without end marker.");
+		return -EINVAL;
+	}
+
+	items = calloc(item_num, sizeof(struct rte_flow_item));
 	if (!items) {
 		rte_flow_error_set(error, ENOMEM,
 				RTE_FLOW_ERROR_TYPE_ITEM_NUM,
@@ -152,7 +205,6 @@ rte_flow_classify_validate(
 		return -ENOMEM;
 	}
 
-	memset(items, 0, item_num * sizeof(struct rte_flow_item));
 	classify_pattern_skip_void_item(items, pattern);
 
 	parse_filter = classify_find_parse_filter_func(items);
