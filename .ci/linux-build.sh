@@ -1,9 +1,6 @@
 #!/bin/sh -xe
 
 on_error() {
-    if [ $? = 0 ]; then
-        exit
-    fi
     FILES_TO_PRINT="build/meson-logs/testlog.txt build/.ninja_log build/meson-logs/meson-log.txt"
 
     for pr_file in $FILES_TO_PRINT; do
