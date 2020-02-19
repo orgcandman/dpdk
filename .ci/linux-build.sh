@@ -48,6 +48,13 @@ else
     OPTS="$OPTS -Dexamples=all"
 fi
 
+# This is checked twice, because there could be config options we want
+# to expose during the build
+if [ "$RUN_TESTS" = "1" ]; then
+    # Enable asan/ubsan
+    OPTS="$OPTS -Db_sanitize=address,undefined"
+fi
+
 OPTS="$OPTS --default-library=$DEF_LIB"
 OPTS="$OPTS --buildtype=debugoptimized"
 meson build --werror $OPTS
