@@ -62,4 +62,5 @@ cmdline_stdin_exit(struct cmdline *cl)
 		return;
 
 	tcsetattr(fileno(stdin), TCSANOW, &cl->oldterm);
+	free(cl);
 }
