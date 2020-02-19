@@ -27,7 +27,7 @@ static void
 parse_set_list(cmdline_portlist_t *pl, size_t low, size_t high)
 {
 	do {
-		pl->map |= (1 << low++);
+		pl->map |= (1U << low++);
 	} while (low <= high);
 }
 
