@@ -132,6 +132,7 @@ test_cmdline_vt100_fns(void)
 static int
 test_cmdline_socket_fns(void)
 {
+	struct cmdline *cl;
 	cmdline_parse_ctx_t ctx;
 
 	if (cmdline_stdin_new(NULL, "prompt") != NULL)
@@ -148,10 +149,13 @@ test_cmdline_socket_fns(void)
 		printf("Error: succeeded in opening invalid file for reading!");
 		return -1;
 	}
-	if (cmdline_file_new(&ctx, "prompt", "/dev/null") == NULL) {
+	if ((cl = cmdline_file_new(&ctx, "prompt", "/dev/null")) == NULL) {
 		printf("Error: failed to open /dev/null for reading!");
 		return -1;
 	}
+
+	/* ensure we free the cmdline */
+	cmdline_free(cl);
 
 	/* void functions */
 	cmdline_stdin_exit(NULL);
