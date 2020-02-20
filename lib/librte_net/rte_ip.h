@@ -44,10 +44,10 @@ struct rte_ipv4_hdr {
 } __rte_packed;
 
 /** Create IPv4 address */
-#define RTE_IPV4(a, b, c, d) ((uint32_t)((((uint8_t)a) & 0xff) << 24) |  \
-					   ((((uint8_t)b) & 0xff) << 16) | \
-					   ((((uint8_t)c) & 0xff) << 8)  | \
-					   (((uint8_t)d) & 0xff))
+#define RTE_IPV4(a, b, c, d) ((uint32_t)(((uint32_t)((uint8_t)a) & 0xffU) << 24) |  \
+					   (((uint32_t)((uint8_t)b) & 0xffU) << 16) | \
+					   (((uint32_t)((uint8_t)c) & 0xffU) << 8)  | \
+					   (((uint32_t)(uint8_t)d) & 0xffU))
 
 /** Maximal IPv4 packet length (including a header) */
 #define RTE_IPV4_MAX_PKT_LEN        65535
