@@ -769,8 +769,9 @@ rte_log2_u64(uint64_t v)
 #define RTE_FMT_TAIL(fmt, ...) __VA_ARGS__
 
 /** Mask value of type "tp" for the first "ln" bit set. */
-#define	RTE_LEN2MASK(ln, tp)	\
-	((tp)((uint64_t)-1 >> (sizeof(uint64_t) * CHAR_BIT - (ln))))
+#define	RTE_LEN2MASK(ln, tp)						\
+	((sizeof(uint64_t) * CHAR_BIT - (ln)) >= sizeof(uint64_t) ?	\
+	 0 : ((tp)((uint64_t)-1 >> (sizeof(uint64_t) * CHAR_BIT - (ln)))))
 
 /** Number of elements in the array. */
 #define	RTE_DIM(a)	(sizeof (a) / sizeof ((a)[0]))
