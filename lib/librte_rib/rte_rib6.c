@@ -76,13 +76,15 @@ is_covered(const uint8_t ip1[RTE_RIB6_IPV6_ADDR_SIZE],
 	return true;
 }
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 static inline int
 get_dir(const uint8_t ip[RTE_RIB6_IPV6_ADDR_SIZE], uint8_t depth)
 {
 	int i = 0;
 	uint8_t p_depth, msk;
 
-	for (p_depth = depth; p_depth >= 8; p_depth -= 8)
+	for (p_depth = depth; p_depth >= 8 && i < RTE_RIB6_IPV6_ADDR_SIZE - 1;
+	     p_depth -= 8)
 		i++;
 
 	msk = 1 << (7 - p_depth);
