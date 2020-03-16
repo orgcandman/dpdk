@@ -87,7 +87,11 @@ get_dir(const uint8_t ip[RTE_RIB6_IPV6_ADDR_SIZE], uint8_t depth)
 	     p_depth -= 8)
 		i++;
 
-	msk = 1 << (7 - p_depth);
+	if (p_depth > 0)
+		msk = 1 << (7 - p_depth);
+	else
+		msk = 1 >> (p_depth - 7);
+
 	return (ip[i] & msk) != 0;
 }
 
