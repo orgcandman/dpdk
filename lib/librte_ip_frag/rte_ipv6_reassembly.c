@@ -8,24 +8,6 @@
 
 #include "ip_frag_common.h"
 
-/**
- * @file
- * IPv6 reassemble
- *
- * Implementation of IPv6 reassembly.
- *
- */
-
-static inline void
-ip_frag_memmove(char *dst, char *src, int len)
-{
-	int i;
-
-	/* go backwards to make sure we don't overwrite anything important */
-	for (i = len - 1; i >= 0; i--)
-		dst[i] = src[i];
-}
-
 /*
  * Reassemble fragments into one packet.
  */
@@ -105,8 +87,8 @@ ipv6_frag_reassemble(struct ip_frag_pkt *fp)
 	frag_hdr = (struct ipv6_extension_fragment *) (ip_hdr + 1);
 	ip_hdr->proto = frag_hdr->next_header;
 
-	ip_frag_memmove(rte_pktmbuf_mtod_offset(m, char *, sizeof(*frag_hdr)),
-			rte_pktmbuf_mtod(m, char*), move_len);
+	memmove(rte_pktmbuf_mtod_offset(m, char *, sizeof(*frag_hdr)),
+		rte_pktmbuf_mtod(m, char*), move_len);
 
 	rte_pktmbuf_adj(m, sizeof(*frag_hdr));
 
