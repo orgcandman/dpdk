@@ -84,6 +84,9 @@ rte_ipv6_fragment_packet(struct rte_mbuf *pkt_in,
 	 * the last fragment) are a multiple of 8 bytes per RFC2460.
 	 */
 
+	if (unlikely (mtu_size < 1280))
+		return -EINVAL;
+
 	frag_size = mtu_size - sizeof(struct rte_ipv6_hdr) -
 		sizeof(struct ipv6_extension_fragment);
 	frag_size = RTE_ALIGN_FLOOR(frag_size, RTE_IPV6_EHDR_FO_ALIGN);

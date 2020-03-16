@@ -80,6 +80,9 @@ rte_ipv4_fragment_packet(struct rte_mbuf *pkt_in,
 	 * Ensure the IP payload length of all fragments is aligned to a
 	 * multiple of 8 bytes as per RFC791 section 2.3.
 	 */
+	if (unlikely (mtu_size < 576))
+		return -EINVAL;
+
 	frag_size = RTE_ALIGN_FLOOR((mtu_size - sizeof(struct rte_ipv4_hdr)),
 				    IPV4_HDR_FO_ALIGN);
 
