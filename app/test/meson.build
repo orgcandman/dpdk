@@ -461,6 +461,8 @@ foreach arg : fast_tests
 		else
 			run_test = false
 		endif
+	else
+		test_args += ['--in-memory']
 	endif
 
 	if (get_option('default_library') == 'shared' and
